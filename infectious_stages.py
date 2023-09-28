@@ -41,14 +41,12 @@ def burst_size_prob(p, nI, b, bursting):
     
     deltI = nI/tauI
     if bursting == False:
-        #probability of burst size b
         prob = sum([binom_coef(k+b-1,b)*(p/(p+deltI+nuI))**b*deltI**(k-1)*nuI/(p+deltI+nuI)**k for k in range(1, nI)])
         prob += binom_coef(nI+b-1,b)*(p/(p+deltI+nuI))**b*deltI**(nI-1)*(deltI+nuI)/(p+deltI+nuI)**nI
+    elif b==0:
+        prob = 1-(deltI/(deltI+nuI))**nI*(1-((deltI+nuI)/(p+deltI+nuI))**nI)
     else:
-        if b==0:
-            prob = 1-(deltI/(deltI+nuI))**nI*(1-((deltI+nuI)/(p+deltI+nuI))**nI)
-        else:
-            prob = binom_coef(nI+b-1,b)*(p/(p+deltI+nuI))**b*(deltI/(p+deltI+nuI))**nI
+        prob = binom_coef(nI+b-1,b)*(p/(p+deltI+nuI))**b*(deltI/(p+deltI+nuI))**nI
     return prob
 
 def pmf_B(p, nI, max_b, bursting):
@@ -199,31 +197,31 @@ def pgf_nb(s, k, prob):
     #pgf of a negative binomal distrbution with parameters k and prob
     return ((1-prob)/(1-prob*s))**k
 
-def pgf(s, nI, tau, theta, p, nu, bursting):
+def pgf(s, nI, theta, bursting):
     #pgf of reproduction number distribution
     #called \pi(s) in paper
     if bursting == False:
         #budding case
-        #Eq. (2.14) in paper with \nu_E=0
-        prob=tau*theta*p/(tau*theta*p + nI + tau*nu)
-        first_sum = sum([(nI/(nI+tau*nu))**(k-1)*(tau*nu/(nI+tau*nu))*pgf_nb(s, k, prob) for k in range(1, nI)])
-        return first_sum + (nI/(nI+tau*nu))**(nI-1)*pgf_nb(s, nI, prob)
+        #Eq. (2.13) in paper with \nu_E=0
+        prob=tauI*theta*p/(tauI*theta*p + nI + tauI*nuI)
+        first_sum = sum([(nI/(nI+tauI*nuI))**(k-1)*(tauI*nuI/(nI+tauI*nuI))*pgf_nb(s, k, prob) for k in range(1, nI)])
+        return first_sum + (nI/(nI+tauI*nuI))**(nI-1)*pgf_nb(s, nI, prob)
     else:
         #bursting case
-        #Eq. (2.15) in paper with \nu_E=0
-        return 1 - (nI/(nI+tau*nu))**(nI)*(1 - ((nI +tau*nu)/(nI + tau*nu + (1-s)*tau*theta*p))**nI)
+        #Eq. (2.14) in paper with \nu_E=0
+        return 1 - (nI/(nI+tauI*nuI))**(nI)*(1 - ((nI +tauI*nuI)/(nI + tauI*nuI + (1-s)*tauI*theta*p))**nI)
  
-def roots(s, nI, tau, theta, p, nu, bursting):
+def roots(s, nI, theta, bursting):
     #function to obtain s-pi(s)
     #we want to find roots of this function, i,e., the fixed points of the pgf,
     #since the smallest root gives the probability that a population
     #of infected cells starting with 1 infected cell will go extinct
-    return s-pgf(s, nI, tau, theta, p, nu, bursting)
+    return s-pgf(s, nI, theta, bursting)
 
-def prob_i(nI, tau, theta, p, nu, i, bursting):
+def prob_i(nI, theta, i, bursting):
     #probability of virus extinction given you start with i infected cells
     #i.e., probability that all i will go extinct
-    return (fsolve(roots, start, args=(nI, tau, theta, p, nu, bursting)))**i
+    return (fsolve(roots, start, args=(nI, theta, bursting)))**i
 
 '''
 #####################################################
@@ -242,7 +240,7 @@ probs = []
 labels = []
 for i, nI in enumerate(nIs):
     R_mean = mean_R(nI, True)
-    probs.append(prob_i(nI, tauI, theta, p, nuI, 1, True))
+    probs.append(prob_i(nI, theta, 1, True))
     labels.append('$n_I$='+str(nI)+'\n'+r' $\bar R=$'+str(round(R_mean,2)))
     
 plt.subplot(122)
@@ -255,7 +253,7 @@ plt.xticks(range(len(nIs)), labels)
 plt.subplot(121)
 for nI in [1,2,5,10,20]:
     B_mean = mean_R(nI, True)/theta
-    probs=np.array([fsolve(roots, start, args=(nI, tauI, theta, p, nuI, True)) for theta in theta_vals])
+    probs=np.array([fsolve(roots, start, args=(nI, theta, True)) for theta in theta_vals])
     plt.plot(theta_vals, probs,label='$n_I$='+str(nI)+r', $\mathbb{E}[B]=$'+str(round(B_mean,2)))
 theta=beta*T0/(beta*T0+c)
 plt.plot([theta, theta], [0.6, 1], '--')
