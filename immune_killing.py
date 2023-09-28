@@ -31,8 +31,6 @@ start=0
 functions to calculate the burst size and reproduction number distributions
 ############################################################################
 '''
-#using the model of viral release by budding
-
 def burst_size_prob(p, nuI, b, bursting):
     '''calculates the probability of burst size b'''
     #if using the model of viral release by budding, set bursting = False
@@ -42,11 +40,10 @@ def burst_size_prob(p, nuI, b, bursting):
         #probability of burst size b
         prob = sum([binom_coef(k+b-1,b)*(p/(p+deltI+nuI))**b*deltI**(k-1)*nuI/(p+deltI+nuI)**k for k in range(1, nI)])
         prob += binom_coef(nI+b-1,b)*(p/(p+deltI+nuI))**b*deltI**(nI-1)*(deltI+nuI)/(p+deltI+nuI)**nI
+    elif b==0:
+        prob = 1-(deltI/(deltI+nuI))**nI*(1-((deltI+nuI)/(p+deltI+nuI))**nI)
     else:
-        if b==0:
-            prob = 1-(deltI/(deltI+nuI))**nI*(1-((deltI+nuI)/(p+deltI+nuI))**nI)
-        else:
-            prob = binom_coef(nI+b-1,b)*(p/(p+deltI+nuI))**b*(deltI/(p+deltI+nuI))**nI
+        prob = binom_coef(nI+b-1,b)*(p/(p+deltI+nuI))**b*(deltI/(p+deltI+nuI))**nI
     return prob
 
 def pmf_B(p, nuI, max_b, bursting):
@@ -154,7 +151,7 @@ f1, ax1 = plt.subplots(1,2,figsize=(20,5))
 plt.subplots_adjust(left=None, bottom=None, right=None, top=1.24, wspace=0.4, hspace=0.4)
 
 plt.subplot(1, 2, 2)
-#create a list to store the probabilities of zero secondary infections for different values of nI
+#create a list to store the probabilities of zero secondary infections for different values of nuI
 probs_0R=[]
 for nuI in nus:
     #calculate the reproduction number distribution
@@ -191,13 +188,13 @@ def pgf(s, nu, bursting):
     #called \pi(s) in paper
     if bursting == False:
         #budding case
-        #Eq. (2.14) in paper with \nu_E=0
+        #Eq. (2.13) in paper with \nu_E=0
         prob=tauI*theta*p/(tauI*theta*p + nI + tauI*nu)
         first_sum = sum([(nI/(nI+tauI*nu))**(k-1)*(tauI*nu/(nI+tauI*nu))*pgf_nb(s, k, prob) for k in range(1, nI)])
         return first_sum + (nI/(nI+tauI*nu))**(nI-1)*pgf_nb(s, nI, prob)
     else:
         #bursting case
-        #Eq. (2.15) in paper with \nu_E=0
+        #Eq. (2.14) in paper with \nu_E=0
         return 1 - (nI/(nI + tauI*nu))**(nI)*(1 - ((nI + tauI*nu)/(nI + tauI*nu + (1-s)*tauI*theta*p))**nI)
  
 def roots(s, nu, bursting):
