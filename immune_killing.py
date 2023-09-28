@@ -37,7 +37,6 @@ def burst_size_prob(p, nuI, b, bursting):
     #if using the model of viral release by bursting, set bursting = True
     
     if bursting == False:
-        #probability of burst size b
         prob = sum([binom_coef(k+b-1,b)*(p/(p+deltI+nuI))**b*deltI**(k-1)*nuI/(p+deltI+nuI)**k for k in range(1, nI)])
         prob += binom_coef(nI+b-1,b)*(p/(p+deltI+nuI))**b*deltI**(nI-1)*(deltI+nuI)/(p+deltI+nuI)**nI
     elif b==0:
@@ -75,19 +74,19 @@ plotting the burst size distribution
 '''
     
 #the chosen values of nu to plot the results for
-nus=[0, 0.25, 0.5, 1, 1.6]
+nus = [0, 0.25, 0.5, 1, 1.6]
 nu_labels = ['0', '0.25', '0.5', '1', '1.6']
 
-max_b=2500
-js=range(max_b+1)
+max_b = 2500
+js = range(max_b+1)
 
 
 #budding case
 plt.figure()
 for nu in nus:
     #calculate the burst size distribution
-    B_dist=pmf_B(p, nu, max_b, False)
-    print('Prob(B < max_b)=',sum(B_dist))
+    B_dist = pmf_B(p, nu, max_b, False)
+    print('Prob(B < max_b) =',sum(B_dist))
     print('mean burst size =', mean_R(nu, False)/theta)
     plt.fill_between(js, [0]*len(js), B_dist, alpha=0.4, label=r'$\nu$='+str(nu))
 plt.xlabel('b (burst size)')
@@ -102,11 +101,11 @@ plt.subplots_adjust(left=None, bottom=None, right=None, top=1.24, wspace=0.4, hs
 
 plt.subplot(1, 2, 2)
 #create a list to store the probabilities of zero burst size for different values of nuI
-probs_0=[]
+probs_0 = []
 for nuI in nus:
     #calculate the burst size distribution
-    B_dist=pmf_B(p, nuI, max_b, True)
-    print('Prob(B < max_b)=',sum(B_dist))
+    B_dist = pmf_B(p, nuI, max_b, True)
+    print('Prob(B < max_b) =',sum(B_dist))
     print('mean burst size =', mean_R(nuI, True)/theta)
     probs_0.append(B_dist[0])
     plt.fill_between(js[1:], [0]*(len(js)-1), B_dist[1:]/(1-B_dist[0]), alpha=0.4, label=r'$\nu_I$='+str(nuI))
@@ -130,15 +129,15 @@ plotting the reproduction number distribution
 #############################################
 '''
     
-max_r=int(theta*max_b)
-Rjs=range(max_r+1)
+max_r = int(theta*max_b)
+Rjs = range(max_r+1)
 
 #budding case
 plt.figure()
 for nu in nus:
     #calculate the reproduction number distribution
-    R_dist=pmf_R(nu, max_r, False)
-    print('Prob(R < max_r)=',sum(R_dist))
+    R_dist = pmf_R(nu, max_r, False)
+    print('Prob(R < max_r) =',sum(R_dist))
     print('mean reproduction number =', mean_R(nu, False))
     plt.fill_between(Rjs, [0]*len(Rjs), R_dist, alpha=0.4, label=r'$\nu_I$='+str(nu))
 plt.xlabel('r (secondary infections)')
@@ -152,10 +151,10 @@ plt.subplots_adjust(left=None, bottom=None, right=None, top=1.24, wspace=0.4, hs
 
 plt.subplot(1, 2, 2)
 #create a list to store the probabilities of zero secondary infections for different values of nuI
-probs_0R=[]
+probs_0R = []
 for nuI in nus:
     #calculate the reproduction number distribution
-    R_dist=pmf_R(nuI, max_r, True)
+    R_dist = pmf_R(nuI, max_r, True)
     print('Prob(R < max_r)=',sum(R_dist))
     print('mean reproduction number =', mean_R(nuI, True))
     probs_0R.append(R_dist[0])
@@ -188,13 +187,13 @@ def pgf(s, nu, bursting):
     #called \pi(s) in paper
     if bursting == False:
         #budding case
-        #Eq. (2.13) in paper with \nu_E=0
-        prob=tauI*theta*p/(tauI*theta*p + nI + tauI*nu)
+        #Eq. (2.13) in paper, with \nu_E=0
+        prob = tauI*theta*p/(tauI*theta*p + nI + tauI*nu)
         first_sum = sum([(nI/(nI+tauI*nu))**(k-1)*(tauI*nu/(nI+tauI*nu))*pgf_nb(s, k, prob) for k in range(1, nI)])
         return first_sum + (nI/(nI+tauI*nu))**(nI-1)*pgf_nb(s, nI, prob)
     else:
         #bursting case
-        #Eq. (2.14) in paper with \nu_E=0
+        #Eq. (2.14) in paper, with \nu_E=0
         return 1 - (nI/(nI + tauI*nu))**(nI)*(1 - ((nI + tauI*nu)/(nI + tauI*nu + (1-s)*tauI*theta*p))**nI)
  
 def roots(s, nu, bursting):
@@ -202,7 +201,7 @@ def roots(s, nu, bursting):
     #we want to find roots of this function, i,e., the fixed points of the pgf,
     #since the smallest root gives the probability that a population
     #of infected cells starting with 1 infected cell will go extinct
-    return s-pgf(s, nu, bursting)
+    return s - pgf(s, nu, bursting)
 
 def prob_i(nu, i, bursting):
     #probability of virus extinction given you start with i infected cells
@@ -214,13 +213,13 @@ def prob_i(nu, i, bursting):
 plot for probability of extinction
 ###################################
 '''
-Is=np.logspace(0,2,100)
+Is = np.logspace(0,2,100)
 
 #budding case
 plt.figure()
 for nu in nus:
-    probs=np.array([prob_i(nu, I, False) for I in Is])
-    plt.plot(Is,probs,label=r'$\nu_I$='+str(nu))
+    probs = np.array([prob_i(nu, I, False) for I in Is])
+    plt.plot(Is, probs, label=r'$\nu_I$='+str(nu))
 plt.gca().set_xscale("log")
 plt.legend(loc=0)
 plt.xlabel('Initial number of infected cells')
@@ -229,9 +228,9 @@ plt.ylabel('Probability of extinction')
 #bursting case
 plt.figure()
 for nu in nus:
-    probs=np.array([prob_i(nu, I, True) for I in Is])
+    probs = np.array([prob_i(nu, I, True) for I in Is])
     print('prob extinction starting from one infected cell =', probs[0])
-    plt.plot(Is,probs,label=r'$\nu_I$='+str(nu))
+    plt.plot(Is, probs, label=r'$\nu_I$='+str(nu))
 plt.gca().set_xscale("log")
 plt.legend(loc=0)
 plt.xlabel('Initial number of infected cells')
