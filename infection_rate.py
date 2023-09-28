@@ -16,21 +16,11 @@ parameter values
 
 p = 1000
 
-tauE = 1.25
-nE = 10
-deltE = nE/tauE
-nuE = 0
-
 tauI = 1.25
 nI = 10
 deltI = nI/tauI
-nuI = 0
 
 c = 7
-
-mean_burst_size = p*tauI
-
-start=0
 
 '''
 ###########################################################################
@@ -96,7 +86,7 @@ def hellinger(P,Q):
 
 '''
 #####################################################
-examples of big differences between case 1 and case 2
+examples of differences between case 1 and case 2
 #####################################################
 '''
 
@@ -118,16 +108,16 @@ for i,T0 in enumerate(Ts):
     print('theta=', theta)
     
     mean_case1=tauI*theta*p
-    print('R0=',mean_case1)
+    print('Rbar=',mean_case1)
     
     max_r=int(2*mean_case1+5)
     js=range(max_r+1)
     
     case1=pmf_R_case1(beta, T0, max_r)
-    print('sum of case 1 distribution =', sum(case1))
+    #print('sum of case 1 distribution =', sum(case1))
     
     case2=pmf_R_case2(beta, T0, max_b, max_r)
-    print('sum of case 2 distribution =', sum(case2))
+    #print('sum of case 2 distribution =', sum(case2))
     
     dist = hellinger(case1,case2)
     print('hellinger distance =', dist)
@@ -136,16 +126,14 @@ for i,T0 in enumerate(Ts):
     if i==0 or i==1:
         plt.bar(range(max_r+1), case1, alpha=0.5, color='tomato', label='Case 1')
         plt.bar(range(max_r+1)[:T0+1], case2[:T0+1], alpha=0.5, color='forestgreen', label='Case 2')
+        plt.ylim(-0.0001,0.3)
     else:
         plt.fill_between(range(max_r+1),[0]*(max_r+1), case1, alpha=0.5, color='tomato', label='Case 1')
         plt.fill_between(range(max_r+1)[:min(max_r,T0)+1],[0]*(min(max_r,T0)+1), case2[:T0+1], alpha=0.5, color='forestgreen', label='Case 2')
+        plt.ylim(-0.0001,0.0035)
     plt.xlabel('r (secondary infections)')
     if i==0 or i==2:
         plt.ylabel('$\mathbb{P}(R=r)$')
-    if i==0 or i==1:
-        plt.ylim(-0.0001,0.3)
-    if i==2 or i==3:
-        plt.ylim(-0.0001,0.0035)
     plt.title('$T_0$='+T_labels[i]+r', $\beta$='+beta_labels[i])
     plt.legend()
 plt.savefig('R_dist_examples_case1_case2.png', bbox_inches='tight')
@@ -172,9 +160,9 @@ for i,T0 in enumerate(T0range):
         mean_case1=tauI*theta*p
         max_r=int(2*mean_case1+5)
         case1=pmf_R_case1(beta, T0, max_r)
-        print('sum of case 1 dist=',sum(case1))
+        #print('sum of case 1 dist=',sum(case1))
         case2=pmf_R_case2(beta, T0, max_b, max_r)
-        print('sum of case 2 dist=',sum(case2))
+        #print('sum of case 2 dist=',sum(case2))
         dist = hellinger(case1,case2)
         dists[j,i]=dist
 
