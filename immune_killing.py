@@ -110,7 +110,7 @@ for nuI in nus:
     probs_0.append(B_dist[0])
     plt.fill_between(js[1:], [0]*(len(js)-1), B_dist[1:]/(1-B_dist[0]), alpha=0.4, label=r'$\nu_I$='+str(nuI))
 plt.xlabel('b (burst size)')
-plt.ylabel(r'$\mathbb{P}(B = b | b \neq 0)$')
+plt.ylabel(r'$\mathbb{P}(B = b | B \neq 0)$')
 plt.legend()
 
 plt.subplot(1,2,1)
@@ -160,7 +160,7 @@ for nuI in nus:
     probs_0R.append(R_dist[0])
     plt.fill_between(Rjs[1:], [0]*(len(Rjs)-1), R_dist[1:]/(1-R_dist[0]), alpha=0.4, label=r'$\nu_I$='+str(nuI))
 plt.xlabel('r (secondary infections)')
-plt.ylabel(r'$\mathbb{P}(R = r | r \neq 0)$')
+plt.ylabel(r'$\mathbb{P}(R = r | R \neq 0)$')
 plt.legend()
 
 plt.subplot(1,2,1)
